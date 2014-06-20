@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <string.h>
+#include "../include/fuzzyfinder.h"
 
 int fuzzymatch(const char * needle, const char * haystack)
 {
