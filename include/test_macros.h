@@ -1,6 +1,7 @@
 #ifndef __TEST_MACROS_H
 #define __TEST_MACROS_H
 
+typedef void (*test)(void);
 #define ASSERT(cond,msg,...)                                                \
     if(!(cond)) do{                                                         \
         fprintf(stderr,"%s:%d " msg "\n",__FILE__,__LINE__, ##__VA_ARGS__); \
