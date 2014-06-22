@@ -1,7 +1,10 @@
-fuzzymatcher
+fuzzyfinder
 ============
 
-Fuzzy select among lines in stdout.
+Fuzzy select among lines in stdin. Lines are filtered according to an
+interactive query inputed by the user. The selected line will be
+outputed to stdout. A line matches a query if the query is a subsequence
+of the line.
 
 It tries to imitate selecta (https://github.com/garybernhardt/selecta)
 but it is written in C so it should be faster (I haven't profiled so I
@@ -18,3 +21,10 @@ Type
     $ make
 
 and you will get a statically linked binary in bin/. Copy wherever you want.
+
+TODO
+----
+
+* Queries cannot contain spaces. Don't know why it does not work.
+* Add UTF-8 support.
+* Profile and optimize the code.
