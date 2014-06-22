@@ -71,7 +71,7 @@ void state_draw()
         if(printed > height) break;
         if(!bit_array_get(state.display_filter,i)) continue;
         const char * line = line_buffer_getline(state.lines,i);
-        if(printed == state.selection){
+        if(i == state.selection){
             bool endseen = false;
             for(int j = 0; j < width; j++){
                 endseen = endseen || !line[j];
@@ -93,15 +93,34 @@ void state_update()
 {
     int lines = line_buffer_linecount(state.lines);
     const char * query = text_buffer_data(state.query);
+    int first_set = -1;
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
         int issub = is_subsequence(query,line);
         if(issub){
             bit_array_set(state.display_filter, i);
+            if(first_set == -1) first_set = i;
         }else{
             bit_array_clear(state.display_filter, i);
         }
     }
+    if(!bit_array_get(state.display_filter,state.selection)){
+        state.selection = first_set;
+    }
+}
+
+void state_update_cursor(int offset)
+{
+    int lines = line_buffer_linecount(state.lines);
+    int pos = state.selection;
+    if(pos+offset < 0 || pos+offset >= lines) return;
+    for(int i = pos+offset; i >= 0 && i < lines; i += offset){
+        if(bit_array_get(state.display_filter, i)){
+            state.selection = i;
+            return;
+        }
+    }
+    state.selection = -1;
 }
 
 int main()
@@ -125,18 +144,15 @@ int main()
         case TB_EVENT_KEY:
             switch(ev.key){
             case TB_KEY_ARROW_UP:
-                if(state.selection > 0){
-                    state.selection--;
-                }
+                state_update_cursor(-1);
                 break;
             case TB_KEY_ARROW_DOWN:
-                if(state.selection < line_buffer_linecount(state.lines)){
-                    state.selection++;
-                }
+                state_update_cursor(1);
                 break;
             case TB_KEY_ENTER:
-                line = line_buffer_getline(state.lines,state.selection);
-                printf("%s\n",line);
+                if(state.selection > 0){
+                    line = line_buffer_getline(state.lines,state.selection);
+                }
                 goto done;
             case TB_KEY_ESC:
                 goto done;
