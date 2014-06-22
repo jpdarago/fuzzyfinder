@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "../deps/include/termbox.h"
 
@@ -27,7 +28,7 @@ void state_init()
 
     while((strl = getline(&line,&length,stdin)) > 0){
         // Remove the '\n'
-        line[strl] = '\0';
+        line[strl-1] = '\0';
         line_buffer_addline(state.lines,line,strl);
         lines++;
     }
@@ -57,37 +58,50 @@ void state_draw()
     tb_change_cell(0, 0,'>', TB_DEFAULT, TB_DEFAULT);
     tb_change_cell(0, 1,' ', TB_DEFAULT, TB_DEFAULT);
 
-    int col = 0, width = tb_width(), height = tb_height();
+    int col = 2, width = tb_width(), height = tb_height();
     const char * query = text_buffer_data(state.query);
     for(int i = 0; query[i]; i++){
-        tb_change_cell(0, col+i, query[i], TB_DEFAULT, TB_DEFAULT);
+        tb_change_cell(col, 0, query[i], TB_WHITE, TB_DEFAULT);
         col++;
     }
 
-    tb_set_cursor(0,col);
-
+    tb_set_cursor(col,0);
+    int printed = 0;
     for(int i = 0; i < line_count; ++i){
-        if(i > height) break;
+        if(printed > height) break;
         if(!bit_array_get(state.display_filter,i)) continue;
         const char * line = line_buffer_getline(state.lines,i);
-        if(i == state.selection){
+        if(printed == state.selection){
             bool endseen = false;
             for(int j = 0; j < width; j++){
                 endseen = endseen || !line[j];
-                if(endseen){
-                    tb_change_cell(i+1,j, ' ', TB_DEFAULT, GREY);
-                }else{
-                    tb_change_cell(i+1,j, line[j], TB_DEFAULT, GREY);
-                }
+                tb_change_cell(j, printed+1, endseen ? ' ' : line[j],
+                    TB_BLACK, GREY);
             }
         }else{
             for(int j = 0; line[j]; j++){
-                tb_change_cell(1+i, j, line[j], TB_DEFAULT, TB_DEFAULT);
+                tb_change_cell(j, printed+1, line[j], TB_WHITE, TB_DEFAULT);
             }
         }
+        printed++;
     }
 
     tb_present();
+}
+
+void state_update()
+{
+    int lines = line_buffer_linecount(state.lines);
+    const char * query = text_buffer_data(state.query);
+    for(int i = 0; i < lines; ++i){
+        const char * line = line_buffer_getline(state.lines,i);
+        int issub = is_subsequence(query,line);
+        if(issub){
+            bit_array_set(state.display_filter, i);
+        }else{
+            bit_array_clear(state.display_filter, i);
+        }
+    }
 }
 
 int main()
@@ -100,21 +114,55 @@ int main()
         return 1;
     }
 
+    state_draw();
     struct tb_event ev;
+    const char * line = NULL;
+
+    char buffer[2] = { '\0', '\0' };
+
     while(tb_poll_event(&ev)){
         switch (ev.type) {
         case TB_EVENT_KEY:
             switch(ev.key){
-                goto done;
+            case TB_KEY_ARROW_UP:
+                if(state.selection > 0){
+                    state.selection--;
+                }
                 break;
+            case TB_KEY_ARROW_DOWN:
+                if(state.selection < line_buffer_linecount(state.lines)){
+                    state.selection++;
+                }
+                break;
+            case TB_KEY_ENTER:
+                line = line_buffer_getline(state.lines,state.selection);
+                printf("%s\n",line);
+                goto done;
+            case TB_KEY_ESC:
+                goto done;
+            case TB_KEY_BACKSPACE:
+            case TB_KEY_BACKSPACE2:
+                text_buffer_remove(state.query,1);
+                state_update();
+                break;
+            default:
+                if(isprint(ev.ch)){
+                    buffer[0] = ev.ch;
+                    state.query = text_buffer_add(state.query,buffer,1);
+                    state_update();
+                }
             }
         case TB_EVENT_RESIZE:
             break;
         }
+        state_draw();
     }
 
 done:
-    state_destroy();
     tb_shutdown();
+    if(line){
+        printf("%s\n", line);
+    }
+    state_destroy();
     return 0;
 }
