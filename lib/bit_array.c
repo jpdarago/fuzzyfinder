@@ -48,7 +48,8 @@ int bit_array_nextset(const bit_array * array, int prev)
 
 void bit_array_setall(bit_array * array)
 {
-    memset(array->buffer,UINT_MAX,array->length);
+    int effective_size = (array->length + wordsize - 1)/wordsize;
+    memset(array->buffer,UINT_MAX,effective_size * wordsize);
 }
 
 int bit_array_get(const bit_array * array, int pos)
