@@ -18,7 +18,7 @@ Build instructions
 
 Type
 
-    $ make
+    $ ./install-dependencies.sh && make
 
 and you will get a statically linked binary in bin/. Copy wherever you want.
 
