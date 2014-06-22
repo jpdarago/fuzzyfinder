@@ -9,6 +9,8 @@ DEPS=deps/lib/libtermbox.a
 tests/%_test: tests/%_test.c lib/%.c
 	$(CC) $(CFLAGS) -o $@ $< $(LIB)
 
+all: install
+
 .PHONY: clean tests
 tests: $(TESTS)
 	@./tests/run-tests.sh
@@ -16,7 +18,11 @@ tests: $(TESTS)
 main: LDLIBS=$(DEPS)
 main: CFLAGS+=-O3 $(LIB)
 main: $(BIN)
-	mv src/main bin/main
+	mv src/main bin/fuzzymatcher
+
+install:
+	./install-dependencies.sh
+	make main
 
 valgrind:
 	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
