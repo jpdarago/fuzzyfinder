@@ -91,7 +91,7 @@ void state_draw()
 
 void state_update()
 {
-    int lines = line_buffer_linecount(state.lines);
+    const int lines = line_buffer_linecount(state.lines);
     const char * query = text_buffer_data(state.query);
     int first_set = -1;
     for(int i = 0; i < lines; ++i){
@@ -104,7 +104,8 @@ void state_update()
             bit_array_clear(state.display_filter, i);
         }
     }
-    if(!bit_array_get(state.display_filter,state.selection)){
+    const int sel = state.selection;
+    if(sel == -1 || !bit_array_get(state.display_filter,sel)){
         state.selection = first_set;
     }
 }
