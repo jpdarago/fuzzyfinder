@@ -12,6 +12,7 @@ bit_array * bit_array_new(int size)
     assert(size > 0);
     int effective_size = (size + wordsize - 1)/wordsize;
     bit_array * ba = calloc(1,sizeof(bit_array)+effective_size*wordsize);
+    assert(ba);
     ba->length = size;
     return ba;
 }

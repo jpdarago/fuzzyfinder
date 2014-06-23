@@ -9,6 +9,7 @@ text_buffer * text_buffer_new(int capacity)
 {
     assert(capacity > 0);
     text_buffer * buffer = calloc(1,sizeof(text_buffer) + capacity);
+    assert(buffer);
     buffer->capacity = capacity;
     return buffer;
 }
@@ -25,6 +26,7 @@ text_buffer * text_buffer_add(text_buffer * buffer,const char * text,int length)
             buffer->capacity *= 2;
         }
         buffer = realloc(buffer, sizeof(text_buffer) + buffer->capacity);
+        assert(buffer);
     }
     memcpy(buffer->data+buffer->length,text,length);
     buffer->length += length;

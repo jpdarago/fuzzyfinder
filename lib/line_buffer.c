@@ -10,6 +10,7 @@ static const int INITIAL_BUFSIZE = 256;
 line_buffer * line_buffer_new(int capacity){
     assert(capacity > 0);
     line_buffer * buffer = calloc(1, sizeof(line_buffer));
+    assert(buffer);
     buffer->capacity = capacity;
     buffer->lines = text_buffer_new(INITIAL_BUFSIZE);
     buffer->skip_vector = calloc(capacity,sizeof(int));
@@ -36,6 +37,7 @@ void line_buffer_addline(line_buffer * buffer, const char * line, int length)
         while(buffer->capacity <= buffer->linecount)
             buffer->capacity *= 2;
         buffer->skip_vector = realloc(buffer->skip_vector,buffer->capacity*sizeof(int));
+        assert(buffer->skip_vector);
     }
     buffer->skip_vector[buffer->linecount] = text_buffer_length(buffer->lines);
     // Include '\0'
