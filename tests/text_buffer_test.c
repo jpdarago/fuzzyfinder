@@ -19,7 +19,7 @@ void test_append_data()
 
 void test_append_lots_of_data()
 {
-    const char * str = "thisisalongstring";
+    const char * str = "thisisareallyreallyreallyreallyreallylongstring";
     const int strlength = strlen(str);
 
     text_buffer * buffer = text_buffer_new(1);
@@ -37,10 +37,36 @@ void test_append_and_remove()
     text_buffer_destroy(buffer);
 }
 
+void test_append_with_spaces()
+{
+    const char * str = "this is a   string";
+    const int strlength = strlen(str);
+
+    text_buffer * buffer = text_buffer_new(5);
+    buffer = text_buffer_add(buffer, str, strlength);
+    ASSERT(!strcmp(text_buffer_data(buffer),str),"unexpected buffer contents");
+    text_buffer_destroy(buffer);
+}
+
+void test_append_one_at_a_time()
+{
+    const char * str = "this is a really really long string with spaces and everything";
+    const int strlength = strlen(str);
+
+    text_buffer * buffer = text_buffer_new(16);
+    for(int i = 0; i < strlength; i++)
+        buffer = text_buffer_add(buffer, &str[i], 1);
+
+    ASSERT(!strcmp(text_buffer_data(buffer),str),"unexpected buffer contents");
+    text_buffer_destroy(buffer);
+}
+
 test tests[] = {
     test_append_data,
     test_append_lots_of_data,
     test_append_and_remove,
+    test_append_with_spaces,
+    test_append_one_at_a_time,
     NULL,
 };
 

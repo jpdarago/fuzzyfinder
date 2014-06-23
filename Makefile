@@ -25,7 +25,7 @@ install:
 	make main
 
 valgrind:
-	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
+	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE) tests
 
 clean:
 	rm -rf $(TESTS) bin/* deps/*

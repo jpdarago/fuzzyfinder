@@ -62,7 +62,7 @@ void state_draw()
     const char * query = text_buffer_data(state.query);
     for(int i = 0; query[i]; i++){
         tb_change_cell(col, 0, query[i], TB_WHITE, TB_DEFAULT);
-        col++;
+        col += (query[i] == '\t') ? 4 : 1;
     }
 
     tb_set_cursor(col,0);
@@ -136,9 +136,9 @@ int main()
 
     state_draw();
     struct tb_event ev;
-    const char * line = NULL;
 
-    char buffer[2] = { '\0', '\0' };
+    const char * line = NULL;
+    char append;
 
     while(tb_poll_event(&ev)){
         switch (ev.type) {
@@ -163,9 +163,14 @@ int main()
                 state_update();
                 break;
             default:
-                if(isprint(ev.ch)){
-                    buffer[0] = ev.ch;
-                    state.query = text_buffer_add(state.query,buffer,1);
+                append = ev.ch;
+                if(ev.key == TB_KEY_SPACE)
+                    append = ' ';
+                if(ev.key == TB_KEY_TAB)
+                    append = '\t';
+
+                if(isprint(append)){
+                    state.query = text_buffer_add(state.query,&append,1);
                     state_update();
                 }
             }

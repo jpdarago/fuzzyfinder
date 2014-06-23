@@ -20,8 +20,8 @@ void text_buffer_destroy(text_buffer * buffer)
 
 text_buffer * text_buffer_add(text_buffer * buffer,const char * text,int length)
 {
-    if(buffer->length + length > buffer->capacity){
-        while(buffer->capacity < buffer->length + length){
+    if(buffer->length + length >= buffer->capacity){
+        while(buffer->capacity <= buffer->length + length){
             buffer->capacity *= 2;
         }
         buffer = realloc(buffer, sizeof(text_buffer) + buffer->capacity);

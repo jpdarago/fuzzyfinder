@@ -25,7 +25,7 @@ and you will get a statically linked binary in bin/. Copy wherever you want.
 TODO
 ----
 
-* Queries cannot contain spaces. Don't know why it does not work.
+* ~~Queries cannot contain spaces. Don't know why it does not work.~~
 * If there are a lot of lines only the first screenful will show.
 * Long lines could break the program (they try to be printed but screen can't hold them).
 * Add UTF-8 support.
