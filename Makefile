@@ -18,7 +18,7 @@ tests: $(TESTS)
 main: LDLIBS=$(DEPS)
 main: CFLAGS+=-O3 $(LIB)
 main: $(BIN)
-	mv src/main bin/fuzzymatcher
+	mv src/main bin/fuzzyfinder
 
 install:
 	./install-dependencies.sh
