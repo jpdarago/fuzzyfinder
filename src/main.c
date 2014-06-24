@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "../deps/include/termbox.h"
+#include "../include/termbox.h"
 
 #include "../include/text_buffer.h"
 #include "../include/bit_array.h"
