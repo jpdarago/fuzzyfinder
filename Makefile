@@ -23,4 +23,4 @@ valgrind:
 	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE) tests
 
 clean:
-	rm -rf $(TESTS) bin/* deps/*
+	rm -rf $(TESTS) bin/*
