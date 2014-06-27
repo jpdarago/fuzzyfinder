@@ -47,16 +47,34 @@ void test_gets_codepoints()
     offset = utf8_buffer_get(buf, 0, &out);
     tb_utf8_char_to_unicode(&expected, "微");
     ASSERT(out == expected, "expected %d got %d", expected, out);;
-    offset = utf8_buffer_get(buf, offset, &out);
+    offset += utf8_buffer_get(buf, offset, &out);
     ASSERT(out == 't', "expected 't' got %c", out);
+    offset += utf8_buffer_get(buf, offset, &out);
+    ASSERT(out == 'r', "expected 'r' got %c", out);
 
     utf8_buffer_destroy(buf);
+}
+
+void test_iterator_works()
+{
+    const char * str = "微trin微";
+
+    utf8_iter it = utf8_iter_new(str);
+
+    uint32_t out = utf8_iter_next(&it), expected;
+    tb_utf8_char_to_unicode(&expected, "微");
+    ASSERT(out == expected, "expected %d got %d", expected, out);;
+    out = utf8_iter_next(&it);
+    ASSERT(out == 't', "expected 't' got %c", out);
+    out = utf8_iter_next(&it);
+    ASSERT(out == 'r', "expected 'r' got %c", out);
 }
 
 test tests[] = {
     test_works_as_buffer,
     test_removes_unicode,
     test_gets_codepoints,
+    test_iterator_works,
     NULL,
 };
 

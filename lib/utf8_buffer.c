@@ -50,3 +50,15 @@ int utf8_buffer_get(const utf8_buffer * buf, int pos, uint32_t * codepoint)
     const char * data = text_buffer_data(buf);
     return tb_utf8_char_to_unicode(codepoint, &data[pos]);
 }
+
+utf8_iter utf8_iter_new(const char * s){
+    return (utf8_iter) { .buf = s, .offset = 0 };
+}
+
+uint32_t utf8_iter_next(utf8_iter * it){
+    uint32_t res;
+    int off = tb_utf8_char_to_unicode(&res, &it->buf[it->offset]);
+    if(off == TB_EOF) return 0;
+    it->offset += off;
+    return res;
+}

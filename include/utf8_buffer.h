@@ -11,4 +11,12 @@ void utf8_buffer_remove(utf8_buffer *, int);
 const char * utf8_buffer_data(const utf8_buffer *);
 int utf8_buffer_get(const utf8_buffer *, int, uint32_t *);
 
+typedef struct {
+    const char * buf;
+    int offset;
+} utf8_iter;
+
+utf8_iter utf8_iter_new(const char *);
+uint32_t utf8_iter_next(utf8_iter *);
+
 #endif

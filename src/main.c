@@ -21,7 +21,7 @@ void state_init()
 {
     state.selection = 0;
     state.lines = line_buffer_new(16);
-    state.query = text_buffer_new(16);
+    state.query = utf8_buffer_new(16);
 
     char * line = NULL;
     size_t length = 0;
@@ -46,7 +46,7 @@ void state_destroy()
 {
     line_buffer_destroy(state.lines);
     bit_array_destroy(state.display_filter);
-    text_buffer_destroy(state.query);
+    utf8_buffer_destroy(state.query);
 }
 
 void state_draw_query()
@@ -55,43 +55,57 @@ void state_draw_query()
     tb_change_cell(0, 1,' ', TB_DEFAULT, TB_DEFAULT);
 
     int col = 2, width = tb_width();
-    const char * query = text_buffer_data(state.query);
-    for(int i = 0; i < width && query[i]; i++){
-        tb_change_cell(col, 0, query[i], TB_WHITE, TB_DEFAULT);
-        col += (query[i] == '\t') ? 4 : 1;
+    uint32_t codepoint;
+
+    int step = utf8_buffer_get(state.query,0,&codepoint);
+    for(int offset = 0;col < width && step >= 0;){
+        offset += step;
+        tb_change_cell(col, 0, codepoint, TB_WHITE, TB_DEFAULT);
+        col += (codepoint == '\t') ? 4 : 1;
+        step = utf8_buffer_get(state.query,offset,&codepoint);
     }
 
     tb_set_cursor(col,0);
 }
 
-void state_draw()
+void state_draw_lines()
 {
     int GREY = 0xf4;
-    tb_clear();
-    tb_select_output_mode(TB_OUTPUT_256);
+    int printed = 0, width = tb_width(), height = tb_height();
     int line_count = line_buffer_linecount(state.lines);
 
-    state_draw_query();
-
-    int printed = 0, width = tb_width(), height = tb_height();
     for(int i = 0; i < line_count; ++i){
         if(printed > height) break;
         if(!bit_array_get(state.display_filter,i)) continue;
         const char * line = line_buffer_getline(state.lines,i);
+        utf8_iter it = utf8_iter_new(line);
         if(i == state.selection){
             bool endseen = false;
             for(int j = 0; j < width; j++){
-                endseen = endseen || !line[j];
-                tb_change_cell(j, printed+1, endseen ? ' ' : line[j],
+                uint32_t next = utf8_iter_next(&it);
+                endseen = endseen || !next;
+                tb_change_cell(j, printed+1, endseen ? ' ' : next,
                     TB_BLACK, GREY);
             }
         }else{
-            for(int j = 0; line[j]; j++){
-                tb_change_cell(j, printed+1, line[j], TB_WHITE, TB_DEFAULT);
+            uint32_t next = utf8_iter_next(&it);
+            for(int j = 0; next; j++){
+                tb_change_cell(j, printed+1, next, TB_WHITE, TB_DEFAULT);
+                next = utf8_iter_next(&it);
             }
         }
         printed++;
     }
+
+}
+
+void state_draw()
+{
+    tb_clear();
+    tb_select_output_mode(TB_OUTPUT_256);
+
+    state_draw_query();
+    state_draw_lines();
 
     tb_present();
 }
@@ -99,7 +113,7 @@ void state_draw()
 void state_update()
 {
     const int lines = line_buffer_linecount(state.lines);
-    const char * query = text_buffer_data(state.query);
+    const char * query = utf8_buffer_data(state.query);
     int first_set = -1;
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
@@ -166,7 +180,7 @@ int main()
                 goto done;
             case TB_KEY_BACKSPACE:
             case TB_KEY_BACKSPACE2:
-                text_buffer_remove(state.query,1);
+                utf8_buffer_remove(state.query,1);
                 state_update();
                 break;
             default:
@@ -177,7 +191,7 @@ int main()
                     append = '\t';
 
                 if(isprint(append)){
-                    state.query = text_buffer_add(state.query,&append,1);
+                    state.query = utf8_buffer_add(state.query,&append,1);
                     state_update();
                 }
             }
