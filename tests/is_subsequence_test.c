@@ -9,5 +9,9 @@ int main(){
     assert(is_subsequence("abc","axbxcxxxx"));
     assert(!is_subsequence("abcd","abc"));
     assert(is_subsequence("","abcd"));
+    assert(is_subsequence("abcd","ABCD"));
+    assert(!is_subsequence("aBcd","AbCD"));
+    assert(is_subsequence("aBcd","ABCD"));
+    assert(is_subsequence("olálá","olálá"));
     return 0;
 }
