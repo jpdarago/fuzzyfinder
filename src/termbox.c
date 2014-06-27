@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "../include/termbox.h"
+#include "../include/utf8.h"
 
 #include "bytebuffer.inl"
 #include "term.inl"

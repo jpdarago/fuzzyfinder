@@ -9,6 +9,6 @@ int utf8_buffer_length(const utf8_buffer *);
 void utf8_buffer_destroy(utf8_buffer*);
 void utf8_buffer_remove(utf8_buffer *, int);
 const char * utf8_buffer_data(const utf8_buffer *);
-int utf8_buffer_get(utf8_buffer *, int, uint32_t *);
+int utf8_buffer_get(const utf8_buffer *, int, uint32_t *);
 
 #endif

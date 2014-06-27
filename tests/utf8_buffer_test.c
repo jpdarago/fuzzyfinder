@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include "../include/utf8.h"
 #include "../include/test_macros.h"
 #include "../include/text_buffer.h"
 #include "../include/utf8_buffer.h"
@@ -32,9 +33,30 @@ void test_removes_unicode()
     utf8_buffer_destroy(buf);
 }
 
+void test_gets_codepoints()
+{
+    const char * str = "微trin微";
+    const int strlength = strlen(str);
+
+    utf8_buffer * buf = utf8_buffer_new(32);
+    buf = utf8_buffer_add(buf, str, strlength);
+
+    uint32_t out, expected;
+    int offset;
+
+    offset = utf8_buffer_get(buf, 0, &out);
+    tb_utf8_char_to_unicode(&expected, "微");
+    ASSERT(out == expected, "expected %d got %d", expected, out);;
+    offset = utf8_buffer_get(buf, offset, &out);
+    ASSERT(out == 't', "expected 't' got %c", out);
+
+    utf8_buffer_destroy(buf);
+}
+
 test tests[] = {
     test_works_as_buffer,
     test_removes_unicode,
+    test_gets_codepoints,
     NULL,
 };
 

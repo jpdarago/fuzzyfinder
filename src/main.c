@@ -6,11 +6,12 @@
 
 #include "../include/text_buffer.h"
 #include "../include/bit_array.h"
+#include "../include/utf8_buffer.h"
 #include "../include/line_buffer.h"
 #include "../include/is_subsequence.h"
 
 struct {
-    text_buffer * query;
+    utf8_buffer * query;
     bit_array * display_filter;
     line_buffer * lines;
     int selection;
@@ -48,6 +49,21 @@ void state_destroy()
     text_buffer_destroy(state.query);
 }
 
+void state_draw_query()
+{
+    tb_change_cell(0, 0,'>', TB_DEFAULT, TB_DEFAULT);
+    tb_change_cell(0, 1,' ', TB_DEFAULT, TB_DEFAULT);
+
+    int col = 2, width = tb_width();
+    const char * query = text_buffer_data(state.query);
+    for(int i = 0; i < width && query[i]; i++){
+        tb_change_cell(col, 0, query[i], TB_WHITE, TB_DEFAULT);
+        col += (query[i] == '\t') ? 4 : 1;
+    }
+
+    tb_set_cursor(col,0);
+}
+
 void state_draw()
 {
     int GREY = 0xf4;
@@ -55,18 +71,9 @@ void state_draw()
     tb_select_output_mode(TB_OUTPUT_256);
     int line_count = line_buffer_linecount(state.lines);
 
-    tb_change_cell(0, 0,'>', TB_DEFAULT, TB_DEFAULT);
-    tb_change_cell(0, 1,' ', TB_DEFAULT, TB_DEFAULT);
+    state_draw_query();
 
-    int col = 2, width = tb_width(), height = tb_height();
-    const char * query = text_buffer_data(state.query);
-    for(int i = 0; query[i]; i++){
-        tb_change_cell(col, 0, query[i], TB_WHITE, TB_DEFAULT);
-        col += (query[i] == '\t') ? 4 : 1;
-    }
-
-    tb_set_cursor(col,0);
-    int printed = 0;
+    int printed = 0, width = tb_width(), height = tb_height();
     for(int i = 0; i < line_count; ++i){
         if(printed > height) break;
         if(!bit_array_get(state.display_filter,i)) continue;

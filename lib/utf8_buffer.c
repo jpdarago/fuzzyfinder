@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "../include/text_buffer.h"
+#include "../include/utf8.h"
 #include "../include/utf8_buffer.h"
 
 utf8_buffer * utf8_buffer_new(int capacity)
@@ -42,4 +43,10 @@ void utf8_buffer_remove(utf8_buffer * buf, int chars)
     }
 
     text_buffer_remove(buf,length - 1 - i);
+}
+
+int utf8_buffer_get(const utf8_buffer * buf, int pos, uint32_t * codepoint)
+{
+    const char * data = text_buffer_data(buf);
+    return tb_utf8_char_to_unicode(codepoint, &data[pos]);
 }
