@@ -27,6 +27,7 @@ TODO
 
 * ~~Queries cannot contain spaces. Don't know why it does not work.~~
 * If there are a lot of lines only the first screenful will show.
+* Use case insensitive search on lower case letters.
 * ~~Long lines could break the program (they try to be printed but screen can't hold them)~~
 * ~~Add UTF-8 support.~~. Add UTF-8 query strings (gotta check with termbox).
 * Remove GNU C99 dependency on _getline_.
