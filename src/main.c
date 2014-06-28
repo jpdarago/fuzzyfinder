@@ -15,6 +15,7 @@ struct {
     bit_array * display_filter;
     line_buffer * lines;
     int selection;
+    int window_start;
 } state;
 
 void state_init()
@@ -37,6 +38,9 @@ void state_init()
         fprintf(stderr, "No lines in input!");
         exit(1);
     }
+
+    state.window_start = 0;
+
     state.display_filter = bit_array_new(lines);
     bit_array_setall(state.display_filter);
     free(line);
@@ -110,13 +114,33 @@ void state_draw()
     tb_present();
 }
 
-void state_update()
+void state_update_buffer(char c)
 {
+    if(c != '\b'){
+        utf8_buffer_add(state.query, &c, 1);
+    }else{
+        utf8_buffer_remove(state.query,1);
+    }
+}
+
+int should_skip_line(int i, char c)
+{
+    // if we added to the buffer and we didnt match before, we cant match now
+    if(c != '\b' && !bit_array_get(state.display_filter, i)) return true;
+    // if we removed from the buffer and we matched before, we still match now
+    if(c == '\b' && bit_array_get(state.display_filter, i)) return true;
+    return false;
+}
+
+void state_update(char c)
+{
+    state_update_buffer(c);
     const int lines = line_buffer_linecount(state.lines);
     const char * query = utf8_buffer_data(state.query);
     int first_set = -1;
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
+        if(should_skip_line(i, c)) continue;
         int issub = is_subsequence(query,line);
         if(issub){
             bit_array_set(state.display_filter, i);
@@ -180,8 +204,7 @@ int main()
                 goto done;
             case TB_KEY_BACKSPACE:
             case TB_KEY_BACKSPACE2:
-                utf8_buffer_remove(state.query,1);
-                state_update();
+                state_update('\b');
                 break;
             default:
                 append = ev.ch;
@@ -191,8 +214,7 @@ int main()
                     append = '\t';
 
                 if(isprint(append)){
-                    state.query = utf8_buffer_add(state.query,&append,1);
-                    state_update();
+                    state_update(append);
                 }
             }
         case TB_EVENT_RESIZE:
