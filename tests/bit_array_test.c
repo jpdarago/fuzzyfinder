@@ -39,6 +39,7 @@ void test_set_all()
     for(int i = 0; i < 4; i++){
         ASSERT(bit_array_get(ba,i), "expected bit %d to be on", i);
     }
+    bit_array_destroy(ba);
 }
 
 test tests[] = {
