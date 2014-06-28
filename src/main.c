@@ -15,7 +15,6 @@ struct {
     bit_array * display_filter;
     line_buffer * lines;
     int selection;
-    int window_start;
 } state;
 
 void state_init()
@@ -39,7 +38,6 @@ void state_init()
         exit(1);
     }
 
-    state.window_start = 0;
 
     state.display_filter = bit_array_new(lines);
     bit_array_setall(state.display_filter);
