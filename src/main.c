@@ -194,7 +194,7 @@ int main()
                 state_update_cursor(1);
                 break;
             case TB_KEY_ENTER:
-                if(state.selection > 0){
+                if(state.selection >= 0){
                     line = line_buffer_getline(state.lines,state.selection);
                 }
                 goto done;
