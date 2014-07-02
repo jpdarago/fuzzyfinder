@@ -14,6 +14,7 @@ tests: $(TESTS)
 
 main: CFLAGS+=-O3 $(LIB)
 main: src/main.c
+	mkdir bin
 	$(CC) $(CFLAGS) -o bin/fuzzyfinder src/*.c
 
 install:

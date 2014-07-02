@@ -31,5 +31,6 @@ TODO
 * ~~Long lines could break the program (they try to be printed but screen can't hold them)~~
 * ~~Add UTF-8 support.~~. Add UTF-8 query strings (gotta check with termbox).
 * ~~Remove GNU C99 dependency on _getline_~~ Not necessary since it builds with clang too.
+* Fix colors for the interface.
 * Profile and optimize the code.
 * Refactor main.c
