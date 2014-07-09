@@ -146,12 +146,16 @@ void state_update(char c)
     const char * query = utf8_buffer_data(state.query);
     int first_set = -1, above = 0;
 
+    // We want to count how many selections we have above us, so that
+    // if we cannot display them all we reset the selection to the first
+    // matching item.
     const int shown = sel >= 0 &&
         is_subsequence(query,line_buffer_getline(state.lines,sel));
 
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
         if(should_skip_line(i, c)){
+            // We still need to take into account the line in the count.
             if(i < sel && shown && bit_array_get(state.display_filter, i)){
                 above++;
             }
@@ -166,6 +170,8 @@ void state_update(char c)
             bit_array_clear(state.display_filter, i);
         }
     }
+    // Reset the selection to the first matching item if there was none, we 
+    // discarded the entry, or we cannot draw it properly.
     if(sel == -1 || !bit_array_get(state.display_filter,sel) || above > height){
         state.selection = first_set;
         state.draw_offset = 0;
@@ -175,13 +181,17 @@ void state_update(char c)
 void state_update_cursor(int offset)
 {
     const int drawoff = state.draw_offset;
+    // Keep it in the edges of the screen
     if(drawoff+offset < 0 || drawoff+offset >= drawing_height()){
         return;
     }
     state.draw_offset += offset;
     int lines = line_buffer_linecount(state.lines);
     int pos = state.selection;
-    if(pos+offset < 0 || pos+offset >= lines) return;
+    // Keep it in the valid lines
+    if(pos+offset < 0 || pos+offset >= lines){
+        return;
+    }
     for(int i = pos+offset; i >= 0 && i < lines; i += offset){
         if(bit_array_get(state.display_filter, i)){
             state.selection = i;
