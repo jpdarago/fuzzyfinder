@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
+#include <signal.h>
+#include <unistd.h>
 
 #include "../include/termbox.h"
 
@@ -177,6 +180,7 @@ int main()
     }
 
     state_draw();
+
     struct tb_event ev;
 
     const char * line = NULL;
@@ -197,6 +201,7 @@ int main()
                     line = line_buffer_getline(state.lines,state.selection);
                 }
                 goto done;
+            case TB_KEY_CTRL_C:
             case TB_KEY_ESC:
                 goto done;
             case TB_KEY_BACKSPACE:
