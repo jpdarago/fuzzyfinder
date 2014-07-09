@@ -38,15 +38,6 @@ void bit_array_clear(bit_array * array, int position)
     array->buffer[position / wordsize] &= ~(1 << (position % wordsize));
 }
 
-int bit_array_nextset(const bit_array * array, int prev)
-{
-    for(int i = prev; i < array->length;i++){
-        int block = array->buffer[i / wordsize];
-        if(block & (1 << i)) return i;
-    }
-    return -1;
-}
-
 void bit_array_setall(bit_array * array)
 {
     int effective_size = (array->length + wordsize - 1)/wordsize;
