@@ -17,12 +17,12 @@ struct {
     utf8_buffer * query;
     bit_array * display_filter;
     line_buffer * lines;
-    int selection;
+    int selection, draw_offset;
 } state;
 
 void state_init()
 {
-    state.selection = 0;
+    state.selection = state.draw_offset = 0;
     state.lines = line_buffer_new(16);
     state.query = utf8_buffer_new(16);
 
@@ -73,13 +73,18 @@ void state_draw_query()
     tb_set_cursor(col,0);
 }
 
+int drawing_height()
+{
+    return tb_height()-1;
+}
+
 void state_draw_lines()
 {
-    int printed = 0, width = tb_width(), height = tb_height();
+    int printed = 0, width = tb_width(), height = drawing_height();
     int line_count = line_buffer_linecount(state.lines);
 
     for(int i = 0; i < line_count; ++i){
-        if(printed > height) break;
+        if(printed >= height) break;
         if(!bit_array_get(state.display_filter,i)) continue;
         const char * line = line_buffer_getline(state.lines,i);
         utf8_iter it = utf8_iter_new(line);
@@ -136,27 +141,44 @@ void state_update(char c)
 {
     state_update_buffer(c);
     const int lines = line_buffer_linecount(state.lines);
+    const int sel = state.selection;
+    const int height = drawing_height();
     const char * query = utf8_buffer_data(state.query);
-    int first_set = -1;
+    int first_set = -1, above = 0;
+
+    const int shown = sel >= 0 &&
+        is_subsequence(query,line_buffer_getline(state.lines,sel));
+
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
-        if(should_skip_line(i, c)) continue;
+        if(should_skip_line(i, c)){
+            if(i < sel && shown && bit_array_get(state.display_filter, i)){
+                above++;
+            }
+            continue;
+        }
         int issub = is_subsequence(query,line);
         if(issub){
             bit_array_set(state.display_filter, i);
             if(first_set == -1) first_set = i;
+            if(i < sel && shown) above++;
         }else{
             bit_array_clear(state.display_filter, i);
         }
     }
-    const int sel = state.selection;
-    if(sel == -1 || !bit_array_get(state.display_filter,sel)){
+    if(sel == -1 || !bit_array_get(state.display_filter,sel) || above > height){
         state.selection = first_set;
+        state.draw_offset = 0;
     }
 }
 
 void state_update_cursor(int offset)
 {
+    const int drawoff = state.draw_offset;
+    if(drawoff+offset < 0 || drawoff+offset >= drawing_height()){
+        return;
+    }
+    state.draw_offset += offset;
     int lines = line_buffer_linecount(state.lines);
     int pos = state.selection;
     if(pos+offset < 0 || pos+offset >= lines) return;
