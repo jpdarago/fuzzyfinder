@@ -72,7 +72,6 @@ void state_draw_query()
 
 void state_draw_lines()
 {
-    int GREY = 0xf4;
     int printed = 0, width = tb_width(), height = tb_height();
     int line_count = line_buffer_linecount(state.lines);
 
@@ -87,7 +86,7 @@ void state_draw_lines()
                 uint32_t next = utf8_iter_next(&it);
                 endseen = endseen || !next;
                 tb_change_cell(j, printed+1, endseen ? ' ' : next,
-                    TB_BLACK, GREY);
+                    TB_BLACK, TB_WHITE);
             }
         }else{
             uint32_t next = utf8_iter_next(&it);
@@ -104,7 +103,7 @@ void state_draw_lines()
 void state_draw()
 {
     tb_clear();
-    tb_select_output_mode(TB_OUTPUT_256);
+    tb_select_output_mode(TB_OUTPUT_NORMAL);
 
     state_draw_query();
     state_draw_lines();
