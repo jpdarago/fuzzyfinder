@@ -121,10 +121,16 @@ void state_draw()
 
 void state_update_buffer(char c)
 {
-    if(c != '\b'){
-        utf8_buffer_add(state.query, &c, 1);
-    }else{
-        utf8_buffer_remove(state.query,1);
+    switch(c){
+        case '\r':
+            utf8_buffer_clear(state.query);
+            break;
+        case '\b':
+            utf8_buffer_remove(state.query,1);
+            break;
+        default:
+            utf8_buffer_add(state.query, &c, 1);
+            break;
     }
 }
 
@@ -140,6 +146,12 @@ int should_skip_line(int i, char c)
 void state_update(char c)
 {
     state_update_buffer(c);
+    if(c == '\r'){
+        // We erased the whole buffer. Set all lines and select first
+        bit_array_setall(state.display_filter);
+        state.selection = state.draw_offset = 0;
+        return;
+    }
     const int lines = line_buffer_linecount(state.lines);
     const int sel = state.selection;
     const int height = drawing_height();
@@ -233,6 +245,9 @@ int main()
                     line = line_buffer_getline(state.lines,state.selection);
                 }
                 goto done;
+            case TB_KEY_CTRL_U:
+                state_update('\r');
+                break;
             case TB_KEY_CTRL_C:
             case TB_KEY_ESC:
                 goto done;

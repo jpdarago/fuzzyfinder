@@ -39,6 +39,12 @@ const char * text_buffer_data(const text_buffer * buffer)
     return buffer->data;
 }
 
+void text_buffer_clear(text_buffer * buffer)
+{
+    buffer->length = 0;
+    buffer->data[0] = '\0';
+}
+
 void text_buffer_remove(text_buffer * buffer, int bytes)
 {
     if(bytes > buffer->length){

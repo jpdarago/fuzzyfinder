@@ -2,19 +2,17 @@
 
 int is_subsequence(const char * needle, const char * haystack)
 {
-    if(*needle == '\0') return 1;
     for(;*haystack;haystack++){
-        if(*needle == '\0'){
+        char s = *needle;
+        if(s == '\0'){
             break;
         }
-        char s = *needle, t = *haystack;
+        char t = *haystack;
         // Use case insensitivity unless the search term is uppercase.
         if(t >= 'A' && t <= 'Z' && s >= 'a' && s <= 'z'){
             t = t - 'A' + 'a';
         }
-        if(s == t){
-            needle++;
-        }
+        needle += (s == t);
     }
     return *needle == '\0';
 }

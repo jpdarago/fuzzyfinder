@@ -22,6 +22,11 @@ utf8_buffer * utf8_buffer_add(utf8_buffer * buf, const char * data, int length)
     return text_buffer_add(buf,data,length);
 }
 
+void utf8_buffer_clear(utf8_buffer *buf)
+{
+    text_buffer_clear(buf);
+}
+
 const char * utf8_buffer_data(const utf8_buffer * buf)
 {
     return text_buffer_data(buf);

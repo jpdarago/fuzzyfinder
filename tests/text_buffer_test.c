@@ -61,12 +61,28 @@ void test_append_one_at_a_time()
     text_buffer_destroy(buffer);
 }
 
+void test_clear_buffer()
+{
+    const char * str = "tuvieja";
+    const int strlength = strlen(str);
+
+    text_buffer * buffer = text_buffer_new(1);
+    buffer = text_buffer_add(buffer,str,strlength);
+    ASSERT(!strcmp(text_buffer_data(buffer),str),"unexpected buffer contents");
+
+    text_buffer_clear(buffer);
+    ASSERT(!strcmp(text_buffer_data(buffer),""),"unexpected buffer contents");
+    ASSERT(text_buffer_length(buffer) == 0, "unexpected buffer length");
+    text_buffer_destroy(buffer);
+}
+
 test tests[] = {
     test_append_data,
     test_append_lots_of_data,
     test_append_and_remove,
     test_append_with_spaces,
     test_append_one_at_a_time,
+    test_clear_buffer,
     NULL,
 };
 
