@@ -2,7 +2,7 @@
 #define __BIT_ARRAY_H
 
 typedef struct {
-    int length;
+    int length, setcount;
     unsigned int buffer[];
 } bit_array;
 
@@ -12,5 +12,7 @@ void bit_array_set(bit_array *,int);
 void bit_array_clear(bit_array *, int);
 void bit_array_setall(bit_array *);
 int bit_array_get(const bit_array *, int);
+int bit_array_ithset(const bit_array *, int);
+int bit_array_setcount(const bit_array *);
 
 #endif
