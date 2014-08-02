@@ -158,16 +158,16 @@ void state_update(char c)
 
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
-        if(should_skip_line(i, c)){
-            continue;
-        }
-        int issub = is_subsequence(query,line);
-        if(issub){
-            bit_array_set(state.display_filter, i);
-            if(first_set == -1) first_set = i;
-        }else{
-            bit_array_clear(state.display_filter, i);
-        }
+        int isset = bit_array_get(state.display_filter, i);
+        if(!should_skip_line(i, c)){
+            isset = is_subsequence(query,line);
+            if(isset){
+                bit_array_set(state.display_filter, i);
+            }else{
+                bit_array_clear(state.display_filter, i);
+            }
+        }           
+        if(isset && first_set == -1) first_set = i;
     }
     
     state.selection = first_set;
