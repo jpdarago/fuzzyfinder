@@ -153,41 +153,25 @@ void state_update(char c)
         return;
     }
     const int lines = line_buffer_linecount(state.lines);
-    const int sel = state.selection;
-    const int height = drawing_height();
     const char * query = utf8_buffer_data(state.query);
-    int first_set = -1, above = 0;
-
-    // We want to count how many selections we have above us, so that
-    // if we cannot display them all we reset the selection to the first
-    // matching item.
-    const int shown = sel >= 0 &&
-        is_subsequence(query,line_buffer_getline(state.lines,sel));
+    int first_set = -1;
 
     for(int i = 0; i < lines; ++i){
         const char * line = line_buffer_getline(state.lines,i);
         if(should_skip_line(i, c)){
-            // We still need to take into account the line in the count.
-            if(i < sel && shown && bit_array_get(state.display_filter, i)){
-                above++;
-            }
             continue;
         }
         int issub = is_subsequence(query,line);
         if(issub){
             bit_array_set(state.display_filter, i);
             if(first_set == -1) first_set = i;
-            if(i < sel && shown) above++;
         }else{
             bit_array_clear(state.display_filter, i);
         }
     }
-    // Reset the selection to the first matching item if there was none, we 
-    // discarded the entry, or we cannot draw it properly.
-    if(sel == -1 || !bit_array_get(state.display_filter,sel) || above > height){
-        state.selection = first_set;
-        state.draw_offset = 0;
-    }
+    
+    state.selection = first_set;
+    state.draw_offset = 0;
 }
 
 void state_update_cursor(int offset)
@@ -210,7 +194,6 @@ void state_update_cursor(int offset)
             return;
         }
     }
-    state.selection = -1;
 }
 
 int main()
