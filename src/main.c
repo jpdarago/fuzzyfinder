@@ -41,7 +41,6 @@ void state_init()
         exit(1);
     }
 
-
     state.display_filter = bit_array_new(lines);
     bit_array_setall(state.display_filter);
     free(line);
@@ -129,7 +128,7 @@ void state_update_buffer(char c)
             utf8_buffer_remove(state.query,1);
             break;
         default:
-            utf8_buffer_add(state.query, &c, 1);
+            state.query = utf8_buffer_add(state.query, &c, 1);
             break;
     }
 }

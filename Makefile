@@ -14,6 +14,7 @@ all: install
 tests: $(TESTS)
 	@./tests/run-tests.sh
 
+$(OBJ): CFLAGS += -O3
 $(OBJ): $(LIB) $(SRCS) 
 	mkdir -p bin
 	$(CC) $(CFLAGS) -o $@ $^

@@ -63,7 +63,7 @@ void test_append_one_at_a_time()
 
 void test_clear_buffer()
 {
-    const char * str = "tuvieja";
+    const char * str = "thisisstuff";
     const int strlength = strlen(str);
 
     text_buffer * buffer = text_buffer_new(1);
