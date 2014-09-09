@@ -22,6 +22,18 @@ You need either clang or GCC. Type in the project root folder:
 
 and you will get a statically linked binary in bin/. Copy wherever you want.
 
+Usage instructions
+------------------
+
+The command receives it's input from _stdin_. Once you give it input, you
+can start typing to filter all lines which contain the query string
+as a subsequence. You can then use Up and Down keys to highlight a diferent
+option among the screenfull, and use Enter to make your final selection.
+
+Example command, select songs from your Music folder
+
+    mpg123 $(find Music -name "*.mp3" | fuzzyfinder)
+
 TODO
 ----
 
