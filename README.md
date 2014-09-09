@@ -28,9 +28,10 @@ Usage instructions
 The command receives it's input from _stdin_. Once you give it input, you
 can start typing to filter all lines which contain the query string
 as a subsequence. You can then use Up and Down keys to highlight a diferent
-option among the screenfull, and use Enter to make your final selection.
+option among the screenfull, and use Enter to make your final selection. Your
+final selection will be outputed to _stdout_.
 
-Example command, select songs from your Music folder
+Example command: select a song from your Music folder
 
     mpg123 $(find Music -name "*.mp3" | fuzzyfinder)
 
