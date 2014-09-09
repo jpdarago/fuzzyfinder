@@ -37,7 +37,7 @@ void state_init()
         lines++;
     }
     if(lines == 0){
-        fprintf(stderr, "No lines in input!");
+        fprintf(stderr, "No lines in input!\n");
         exit(1);
     }
 
