@@ -33,7 +33,7 @@ final selection will be outputed to _stdout_.
 
 Example command: select a song from your Music folder
 
-    mpg123 $(find Music -name "*.mp3" | fuzzyfinder)
+    $ mpg123 $(find Music -name "*.mp3" | fuzzyfinder)
 
 TODO
 ----
